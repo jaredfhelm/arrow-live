@@ -33,16 +33,22 @@ const el = (tag, attrs, parent) => {
   (parent || svg).appendChild(e); return e;
 };
 
-// --- layout: fixed columns by kind, y by order within column (deterministic) ---
+// --- layout: kind bands, wrapped into sub-columns (deterministic) ---
+// A populous kind wraps at WRAP rows instead of becoming one endless rail:
+// a 199-object world rendered as an unreadable vertical line before this.
 const cols = {}; KINDS.forEach(k => cols[k] = []);
 DATA.objects.forEach(o => cols[o.kind].push(o));
-const pos = {}; const CW = 250, X0 = 130, Y0 = 70, DY = 64;
-let maxRows = 1;
-KINDS.forEach((k, i) => {
-  cols[k].forEach((o, j) => { pos[o.id] = { x: X0 + i * CW, y: Y0 + j * DY }; });
-  maxRows = Math.max(maxRows, cols[k].length);
+const pos = {}; const SUBW = 250, X0 = 130, Y0 = 70, DY = 64, WRAP = 20, GAP = 90;
+let x = X0, maxRows = 1;
+KINDS.forEach(k => {
+  const n = cols[k].length, subs = Math.max(1, Math.ceil(n / WRAP));
+  cols[k].forEach((o, j) => {
+    pos[o.id] = { x: x + Math.floor(j / WRAP) * SUBW, y: Y0 + (j % WRAP) * DY };
+  });
+  maxRows = Math.max(maxRows, Math.min(n || 1, WRAP));
+  x += subs * SUBW + GAP;
 });
-const W = X0 + KINDS.length * CW, H = Y0 + maxRows * DY + 40;
+const W = x, H = Y0 + maxRows * DY + 40;
 svg.setAttribute("viewBox", "0 0 " + W + " " + H);
 
 // --- edges (drawn first, under nodes) ---
@@ -55,10 +61,12 @@ DATA.arrows.forEach(a => {
   const bend = ((hash(a.id) % 7) - 3) * 18;
   const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
   const cx = mx - (dy / len) * bend, cy = my + (dx / len) * bend;
+  // dense worlds thin their ink: thousands of edges at full opacity are a ribbon.
   const path = el("path", {
     d: "M" + p1.x + " " + p1.y + " Q" + cx + " " + cy + " " + p2.x + " " + p2.y,
     class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
-    stroke: typeColor(a.mtype)
+    stroke: typeColor(a.mtype),
+    "stroke-opacity": DATA.arrows.length > 800 ? 0.22 : 0.6
   });
   el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: typeColor(a.mtype) });
   path.addEventListener("click", () => {
