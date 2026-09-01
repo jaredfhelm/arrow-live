@@ -10,6 +10,12 @@ body{margin:0;display:flex;font:13px/1.4 system-ui,sans-serif;background:#111;co
 .node:hover rect{stroke:#9ac6ff;fill:#293042}
 .node.sel rect{stroke:#7ab8ff;stroke-width:2;fill:#22304a}
 .node text{fill:#ddd;font-size:12px;pointer-events:none}
+.node.star text{fill:#6b7686;font-size:9px}
+.node.star:hover text,.node.star.sel text{fill:#fff;font-size:11px}
+.starhit{fill:#000;fill-opacity:0;cursor:pointer}
+.starcore{stroke:#0b0e14;stroke-width:1}
+.node.star:hover .starcore{r:6}
+.node.star.sel .starcore{r:6.5;stroke:#7ab8ff;stroke-width:2}
 .edgehit{fill:none;stroke:#000;stroke-opacity:0;stroke-width:14;cursor:pointer;pointer-events:stroke}
 .edgeg:hover .edge{stroke-width:3;opacity:1;stroke-opacity:1}
 .edgeg.dim .edge{opacity:.05}
@@ -43,7 +49,11 @@ const el = (tag, attrs, parent) => {
 // a 199-object world rendered as an unreadable vertical line before this.
 const cols = {}; KINDS.forEach(k => cols[k] = []);
 DATA.objects.forEach(o => cols[o.kind].push(o));
-const pos = {}; const SUBW = 250, X0 = 130, Y0 = 70, DY = 64, WRAP = 20, GAP = 90;
+// STAR mode: past ~60 objects, boxes stop being nodes and start being occlusion —
+// a large world renders as a universe of points with whisper labels instead.
+const STAR = DATA.objects.length > 60;
+const pos = {}; const SUBW = STAR ? 175 : 250, X0 = 130, Y0 = 70, DY = STAR ? 30 : 64,
+  WRAP = STAR ? 28 : 20, GAP = STAR ? 70 : 90;
 let x = X0, maxRows = 1;
 const bandMid = {};
 KINDS.forEach(k => {
@@ -116,10 +126,19 @@ KINDS.forEach(k => {
   el("text", { x: bandMid[k], y: 34, "text-anchor": "middle", class: "colhead" }).textContent = k.toUpperCase();
   cols[k].forEach(o => {
     const p = pos[o.id];
-    const g = el("g", { class: "node", transform: "translate(" + (p.x - 80) + "," + (p.y - 16) + ")" });
-    el("rect", { width: 160, height: 32 }, g);
-    const t = el("text", { x: 80, y: 20, "text-anchor": "middle" }, g);
-    t.textContent = o.label.length > 22 ? o.label.slice(0, 21) + "…" : o.label;
+    let g;
+    if (STAR) {
+      g = el("g", { class: "node star", transform: "translate(" + p.x + "," + p.y + ")" });
+      el("circle", { r: 13, class: "starhit" }, g);
+      el("circle", { r: 4, class: "starcore", fill: typeColor(KINDS.indexOf(k) >= 0 ? DATA.types[KINDS.indexOf(k) % DATA.types.length] : DATA.types[0]) }, g);
+      const t = el("text", { x: 9, y: 3.5 }, g);
+      t.textContent = o.label.length > 18 ? o.label.slice(0, 17) + "…" : o.label;
+    } else {
+      g = el("g", { class: "node", transform: "translate(" + (p.x - 80) + "," + (p.y - 16) + ")" });
+      el("rect", { width: 160, height: 32 }, g);
+      const t = el("text", { x: 80, y: 20, "text-anchor": "middle" }, g);
+      t.textContent = o.label.length > 22 ? o.label.slice(0, 21) + "…" : o.label;
+    }
     g.dataset.id = o.id;
     g.addEventListener("click", () => {
       const at = sel.indexOf(o.id);
