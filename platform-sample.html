@@ -1,0 +1,148 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>arrow board</title><style>
+body{margin:0;display:flex;font:13px/1.4 system-ui,sans-serif;background:#111;color:#ddd}
+#g{flex:1;height:100vh}
+#panel{width:340px;height:100vh;overflow:auto;padding:14px;background:#1a1a1a;border-left:1px solid #333;box-sizing:border-box}
+#panel h2{font-size:14px;margin:0 0 8px}
+#panel a{color:#7ab8ff;word-break:break-all}
+.node{cursor:pointer}
+.node rect{fill:#222;stroke:#555;rx:6}
+.node.sel rect{stroke:#7ab8ff;stroke-width:2}
+.node text{fill:#ddd;font-size:12px;pointer-events:none}
+.colhead{fill:#666;font-size:11px;letter-spacing:2px}
+.edge{fill:none;stroke-width:1.5;cursor:pointer;opacity:.75}
+.edge:hover{stroke-width:3;opacity:1}
+.edge.matched{stroke:#4caf50!important;stroke-width:3;opacity:1}
+.edge.missing{stroke:#e53935!important;stroke-dasharray:6 4;stroke-width:2;opacity:1}
+.legend{font-size:11px}
+.chain{margin:6px 0;padding:6px;background:#222;border-radius:4px;cursor:pointer}
+.chain:hover{background:#2a2a2a}
+small{color:#888}
+</style></head><body>
+<svg id="g"></svg><div id="panel"><h2>arrow board</h2><div id="info">click an edge for its evidence; click two nodes for their composites.</div></div>
+<script>
+const DATA = {"arrows":[{"basis":"reported","date":"2026-08-30","dual":false,"from":"agent-governance","id":"agent-governance:moves-metric:adoption-depth:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/introducing-coder-agents","to":"adoption-depth"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"air-gap-deployment","id":"air-gap-deployment:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"air-gap capability as regulated-segment retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"audit-logging","id":"audit-logging:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"governance features as regulated-industry retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"dormancy-cleanup","id":"dormancy-cleanup:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"resource hygiene as cost lever","source":"https://coder.com/docs/admin/templates/managing-templates/schedule","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:health-check-endpoint:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/health-check","to":"health-check-endpoint"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:prometheus-metrics:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/integrations/prometheus","to":"prometheus-metrics"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":"deflection section of value-levers doc explicitly thin; corpus cross-edge only","source":"https://coder.com/docs/admin/monitoring","to":"ticket-deflection"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":"license resource in provider docs listing; individual schemas unverified per corpus","source":"https://api.github.com/repos/coder/terraform-provider-coderd/contents/docs/resources","to":"coderd-provider"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":null,"source":"https://coder.com/pricing","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:exposes-api:notification-webhooks:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"notification-webhooks"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"ticket-deflection"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:automatable-via:cli-prebuilds:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli","to":"cli-prebuilds"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/templates/extending-templates/prebuilt-workspaces","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"provisioner-management","id":"provisioner-management:automatable-via:external-provisioners:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/admin/provisioners","to":"external-provisioners"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-push:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_push","to":"cli-templates-push"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-versions:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_versions","to":"cli-templates-versions"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":null,"source":"https://registry.terraform.io/providers/coder/coderd/latest/docs","to":"coderd-provider"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:exposes-api:api-templates-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/templates","to":"api-templates-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/how-abridge-scaled-developer-infrastructure-from-days-to-minutes","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:automatable-via:cli-tokens:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/tokens","to":"cli-tokens"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:exposes-api:api-authentication:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/authentication","to":"api-authentication"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"user-onboarding","id":"user-onboarding:moves-metric:time-to-value:0","mtype":"moves-metric","note":"payabl: ~8 hrs/week freed for DevOps/senior engineers","source":"https://coder.com/success-stories/payabl","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-builds-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/builds","to":"api-builds-family"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-workspaces-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/workspaces","to":"api-workspaces-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/coder-improves-developer-productivity","to":"time-to-value"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"workspace-scheduling","id":"workspace-scheduling:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"cost control drives renewal economics; corpus infers, no direct Coder statement","source":"https://coder.com/docs/user-guides/workspace-scheduling","to":"renewal-expansion"}],"objects":[{"id":"adoption-depth","kind":"theater","label":"Adoption Depth"},{"id":"agent-governance","kind":"asset","label":"AI Agent Governance"},{"id":"air-gap-deployment","kind":"asset","label":"Air-Gapped Deployment"},{"id":"api-authentication","kind":"asset","label":"REST API: Authentication & Tokens"},{"id":"api-builds-family","kind":"asset","label":"REST API: Builds Family"},{"id":"api-templates-family","kind":"asset","label":"REST API: Templates Family"},{"id":"api-workspaces-family","kind":"asset","label":"REST API: Workspaces Family"},{"id":"audit-logging","kind":"asset","label":"Audit Logging (Premium)"},{"id":"cli-prebuilds","kind":"asset","label":"CLI: coder prebuilds"},{"id":"cli-templates-push","kind":"asset","label":"CLI: coder templates push"},{"id":"cli-templates-versions","kind":"asset","label":"CLI: coder templates versions"},{"id":"cli-tokens","kind":"asset","label":"CLI: coder tokens"},{"id":"coder","kind":"actor","label":"Coder Technologies"},{"id":"coderd-provider","kind":"asset","label":"coderd Terraform Provider"},{"id":"dormancy-cleanup","kind":"asset","label":"Dormancy & Auto-Deletion"},{"id":"external-provisioners","kind":"asset","label":"External Provisioners & Keys"},{"id":"health-check-endpoint","kind":"asset","label":"Health Check Endpoint"},{"id":"health-monitoring","kind":"asset","label":"Deployment Health Monitoring"},{"id":"license-management","kind":"asset","label":"License Management"},{"id":"notification-webhooks","kind":"asset","label":"Webhook Notification Delivery"},{"id":"notifications-delivery","kind":"asset","label":"Notifications & Webhooks"},{"id":"prebuilt-workspaces","kind":"asset","label":"Prebuilt Workspaces"},{"id":"prometheus-metrics","kind":"asset","label":"Prometheus Metrics"},{"id":"provisioner-management","kind":"asset","label":"Provisioner Management"},{"id":"renewal-expansion","kind":"theater","label":"Renewal & Expansion"},{"id":"template-management","kind":"asset","label":"Template Management"},{"id":"ticket-deflection","kind":"theater","label":"Support-Ticket Deflection"},{"id":"time-to-value","kind":"theater","label":"Time-to-Value"},{"id":"token-auth","kind":"asset","label":"Token Authentication"},{"id":"user-onboarding","kind":"asset","label":"User & Team Onboarding"},{"id":"workspace-provisioning","kind":"asset","label":"Workspace Provisioning"},{"id":"workspace-scheduling","kind":"asset","label":"Workspace Scheduling (autostart/autostop/TTL)"}],"overlay":null,"table":[{"a":"controls","b":"controls","gives":"controls"},{"a":"controls","b":"depends-on","gives":"controls"},{"a":"depends-on","b":"depends-on","gives":"depends-on"},{"a":"exposes","b":"guaranteed-by","gives":"confronts"},{"a":"guarantees","b":"depends-on","gives":"guarantees"},{"a":"hosts","b":"depends-on","gives":"hosts"},{"a":"member-of","b":"member-of","gives":"member-of"},{"a":"pressures","b":"guaranteed-by","gives":"confronts"},{"a":"pressures","b":"member-of","gives":"exposes"}],"types":["automatable-via","confronts","controls","depends-on","exposes","exposes-api","guaranteed-by","guarantees","hosts","member-of","moves-metric","pressures","signals"]};
+const KINDS = ["actor","bloc","asset","theater"];
+const PALETTE = ["#7ab8ff","#ffb74d","#ba68c8","#4db6ac","#f06292","#aed581","#ff8a65","#90a4ae","#dce775","#9575cd"];
+const svg = document.getElementById("g"), panel = document.getElementById("info");
+const NS = "http://www.w3.org/2000/svg";
+const typeColor = t => PALETTE[Math.max(0, DATA.types.indexOf(t)) % PALETTE.length];
+const el = (tag, attrs, parent) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || svg).appendChild(e); return e;
+};
+
+// --- layout: fixed columns by kind, y by order within column (deterministic) ---
+const cols = {}; KINDS.forEach(k => cols[k] = []);
+DATA.objects.forEach(o => cols[o.kind].push(o));
+const pos = {}; const CW = 250, X0 = 130, Y0 = 70, DY = 64;
+let maxRows = 1;
+KINDS.forEach((k, i) => {
+  cols[k].forEach((o, j) => { pos[o.id] = { x: X0 + i * CW, y: Y0 + j * DY }; });
+  maxRows = Math.max(maxRows, cols[k].length);
+});
+const W = X0 + KINDS.length * CW, H = Y0 + maxRows * DY + 40;
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+
+// --- edges (drawn first, under nodes) ---
+const hash = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+const matchedSet = new Set(DATA.overlay ? DATA.overlay.matched : []);
+DATA.arrows.forEach(a => {
+  const p1 = pos[a.from], p2 = pos[a.to];
+  if (!p1 || !p2) return;
+  const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+  const bend = ((hash(a.id) % 7) - 3) * 18;
+  const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+  const cx = mx - (dy / len) * bend, cy = my + (dx / len) * bend;
+  const path = el("path", {
+    d: "M" + p1.x + " " + p1.y + " Q" + cx + " " + cy + " " + p2.x + " " + p2.y,
+    class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
+    stroke: typeColor(a.mtype)
+  });
+  el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: typeColor(a.mtype) });
+  path.addEventListener("click", () => {
+    panel.innerHTML = "<b>" + a.from + "</b> &mdash;" + a.mtype + "&rarr; <b>" + a.to + "</b>"
+      + "<br><small>" + a.id + (a.dual ? " (dual)" : "") + "</small>"
+      + "<p>[" + a.basis + " " + a.date + "]<br>"
+      + (/^https?:/.test(a.source) ? '<a href="' + a.source + '">' + a.source + "</a>" : a.source)
+      + (a.note ? "<br><small>" + a.note + "</small>" : "") + "</p>";
+  });
+});
+
+// --- missing edges from a pattern overlay ---
+if (DATA.overlay) DATA.overlay.missing.forEach(m => {
+  const p1 = pos[m.from], p2 = pos[m.to];
+  if (p1 && p2) el("path", {
+    d: "M" + p1.x + " " + p1.y + " L" + p2.x + " " + p2.y,
+    class: "edge missing", stroke: "#e53935"
+  });
+});
+
+// --- nodes ---
+const sel = [];
+KINDS.forEach((k, i) => {
+  el("text", { x: X0 + i * CW, y: 34, "text-anchor": "middle", class: "colhead" }).textContent = k.toUpperCase();
+  cols[k].forEach(o => {
+    const p = pos[o.id];
+    const g = el("g", { class: "node", transform: "translate(" + (p.x - 80) + "," + (p.y - 16) + ")" });
+    el("rect", { width: 160, height: 32 }, g);
+    const t = el("text", { x: 80, y: 20, "text-anchor": "middle" }, g);
+    t.textContent = o.label.length > 22 ? o.label.slice(0, 21) + "…" : o.label;
+    g.dataset.id = o.id;
+    g.addEventListener("click", () => {
+      const at = sel.indexOf(o.id);
+      if (at >= 0) sel.splice(at, 1); else { sel.push(o.id); if (sel.length > 2) sel.shift(); }
+      document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", sel.includes(n.dataset.id)));
+      if (sel.length === 2) showComposites(sel[0], sel[1]);
+    });
+  });
+});
+
+// --- typed left-fold path search, a direct port of path.rs ---
+const TBL = {}; DATA.table.forEach(r => TBL[r.a + "|" + r.b] = r.gives);
+const OUT = {}; DATA.arrows.forEach(a => (OUT[a.from] = OUT[a.from] || []).push(a));
+Object.values(OUT).forEach(v => v.sort((a, b) => a.id < b.id ? -1 : 1));
+function composites(from, to, maxLen) {
+  const best = {};
+  const dfs = (node, running, steps, visited) => {
+    if (steps.length >= maxLen) return;
+    (OUT[node] || []).forEach(a => {
+      const nt = running === null ? a.mtype : TBL[running + "|" + a.mtype];
+      if (nt === undefined || visited.has(a.to)) return;
+      steps.push(a);
+      if (a.to === to) {
+        if (!best[nt] || steps.length < best[nt].length) best[nt] = steps.slice();
+      } else {
+        visited.add(a.to); dfs(a.to, nt, steps, visited); visited.delete(a.to);
+      }
+      steps.pop();
+    });
+  };
+  const v = new Set([from]); dfs(from, null, [], v);
+  return best;
+}
+function showComposites(a, b) {
+  const best = composites(a, b, 4);
+  const keys = Object.keys(best).sort();
+  let html = "<b>" + a + " &rarr; " + b + "</b>";
+  if (!keys.length) html += "<p>no composite under length 4</p>";
+  keys.forEach(t => {
+    html += '<div class="chain"><b style="color:' + typeColor(t) + '">' + t + "</b> (length " + best[t].length + ")";
+    best[t].forEach(s => html += "<br><small>" + s.id + " [" + s.basis + " " + s.date + "]</small>");
+    html += "</div>";
+  });
+  panel.innerHTML = html;
+}
+
+// --- legend + overlay summary ---
+let lg = "<hr><div class='legend'>";
+DATA.types.forEach(t => lg += '<span style="color:' + typeColor(t) + '">&#9632;</span> ' + t + "&nbsp; ");
+lg += "</div>";
+if (DATA.overlay) {
+  lg += "<hr><b>pattern: " + DATA.overlay.name + "</b> &mdash; " + (DATA.overlay.complete ? "complete" : "near-miss");
+  Object.keys(DATA.overlay.bindings || {}).forEach(r => lg += "<br><small>" + r + " = " + DATA.overlay.bindings[r] + "</small>");
+  DATA.overlay.missing.forEach(m => lg += "<br><small style='color:#e53935'>missing: " + m.from + " -" + m.mtype + "-> " + m.to + "</small>");
+}
+document.getElementById("panel").insertAdjacentHTML("beforeend", lg);
+</script></body></html>
