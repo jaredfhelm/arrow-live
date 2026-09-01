@@ -12,14 +12,14 @@ body.cosmos{background:#080b11}
 #panel h2{font-size:14px;margin:0 0 8px}
 #panel a{color:#7ab8ff;word-break:break-all}
 .node{cursor:pointer}
-.node rect{fill:#222;stroke:#555;rx:6}
-.node:hover rect{stroke:#9ac6ff;fill:#293042}
-.node.sel rect{stroke:#7ab8ff;stroke-width:2;fill:#22304a}
+.node rect:not(.labelhit){fill:#222;stroke:#555;rx:6}
+.node:hover rect:not(.labelhit){stroke:#9ac6ff;fill:#293042}
+.node.sel rect:not(.labelhit){stroke:#7ab8ff;stroke-width:2;fill:#22304a}
 .node text{fill:#ddd;font-size:12px;pointer-events:none}
-.node.star text{fill:#6b7686;font-size:9px}
-.node.star:hover text,.node.star.sel text{fill:#fff;font-size:11px}
-.starhit{fill:#000;fill-opacity:0;cursor:pointer}
-.starcore{stroke:#0b0e14;stroke-width:1}
+.node.star text{fill:#6b7686;font-size:9.5px}
+.node.star:hover text,.node.star.sel text{fill:#fff}
+.node rect.labelhit{fill:#000;fill-opacity:0;stroke:none;cursor:pointer}
+.starcore{stroke:#0b0e14;stroke-width:1;transition:r .12s ease}
 .node.star:hover .starcore{r:6}
 .node.star.sel .starcore{r:6.5;stroke:#7ab8ff;stroke-width:2}
 .edgehit{fill:none;stroke:#000;stroke-opacity:0;stroke-width:14;cursor:pointer;pointer-events:stroke}
@@ -27,12 +27,19 @@ body.cosmos{background:#080b11}
 .edgeg.lit .edge{opacity:1;stroke-opacity:.85}
 .edgeg.dim .edge{opacity:.05}
 .edgeg.dim{pointer-events:none}
-.node.star.lit text{fill:#c9d4e2;font-size:10px}
+.edgeg circle{pointer-events:none}
+.node.star.lit text{fill:#c9d4e2}
 .node.star.lit .starcore{r:5.5}
 .colhead{fill:#666;font-size:11px;letter-spacing:2px}
 .colhead.ghost{fill:#232b38;font-size:30px;letter-spacing:10px}
-.edge{fill:none;stroke-width:1.5;cursor:pointer;opacity:.75;transition:opacity .18s,stroke-opacity .18s}
-.node text{transition:fill .15s}
+.edge{fill:none;stroke-width:1.5;opacity:.75;pointer-events:none;transition:opacity .12s,stroke-opacity .12s}
+.edgebase{fill:none;stroke-width:1.2;stroke-opacity:.07;pointer-events:none;transition:stroke-opacity .15s}
+body.selon .edgebase{stroke-opacity:.025}
+.edgeon{fill:none;stroke-width:2;stroke-opacity:.9;pointer-events:none}
+body.cam .edge,body.cam .node text,body.cam .starcore,body.cam .edgebase{transition:none}
+.node text{transition:fill .12s}
+#hint{position:fixed;left:12px;bottom:10px;font-size:11px;color:#5b6472;pointer-events:none;font-family:ui-monospace,monospace}
+@media (max-width:720px){#hint{display:none}}
 .edge:hover{stroke-width:3;opacity:1}
 .edge.matched{stroke:#4caf50!important;stroke-width:3;opacity:1}
 .edge.missing{stroke:#e53935!important;stroke-dasharray:6 4;stroke-width:2;opacity:1}
@@ -41,7 +48,7 @@ body.cosmos{background:#080b11}
 .chain:hover{background:#2a2a2a}
 small{color:#888}
 </style></head><body>
-<svg id="g"></svg><div id="panel"><h2>arrow board</h2><div id="info">click an edge for its evidence; click two nodes for their composites.</div></div>
+<svg id="g"></svg><div id="panel"><h2>arrow board</h2><div id="info">click an edge for its evidence; click two nodes for their composites.</div></div><div id="hint">scroll zoom &middot; drag pan &middot; double-click dive &middot; F fit &middot; Esc reset</div>
 <script>
 const DATA = {"arrows":[{"basis":"reported","date":"2026-08-30","dual":false,"from":"agent-governance","id":"agent-governance:moves-metric:adoption-depth:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/introducing-coder-agents","to":"adoption-depth"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"air-gap-deployment","id":"air-gap-deployment:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"air-gap capability as regulated-segment retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"audit-logging","id":"audit-logging:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"governance features as regulated-industry retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"dormancy-cleanup","id":"dormancy-cleanup:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"resource hygiene as cost lever","source":"https://coder.com/docs/admin/templates/managing-templates/schedule","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:health-check-endpoint:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/health-check","to":"health-check-endpoint"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:prometheus-metrics:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/integrations/prometheus","to":"prometheus-metrics"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":"deflection section of value-levers doc explicitly thin; corpus cross-edge only","source":"https://coder.com/docs/admin/monitoring","to":"ticket-deflection"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":"license resource in provider docs listing; individual schemas unverified per corpus","source":"https://api.github.com/repos/coder/terraform-provider-coderd/contents/docs/resources","to":"coderd-provider"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":null,"source":"https://coder.com/pricing","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:exposes-api:notification-webhooks:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"notification-webhooks"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"ticket-deflection"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:automatable-via:cli-prebuilds:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli","to":"cli-prebuilds"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/templates/extending-templates/prebuilt-workspaces","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"provisioner-management","id":"provisioner-management:automatable-via:external-provisioners:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/admin/provisioners","to":"external-provisioners"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-push:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_push","to":"cli-templates-push"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-versions:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_versions","to":"cli-templates-versions"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":null,"source":"https://registry.terraform.io/providers/coder/coderd/latest/docs","to":"coderd-provider"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:exposes-api:api-templates-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/templates","to":"api-templates-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/how-abridge-scaled-developer-infrastructure-from-days-to-minutes","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:automatable-via:cli-tokens:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/tokens","to":"cli-tokens"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:exposes-api:api-authentication:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/authentication","to":"api-authentication"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"user-onboarding","id":"user-onboarding:moves-metric:time-to-value:0","mtype":"moves-metric","note":"payabl: ~8 hrs/week freed for DevOps/senior engineers","source":"https://coder.com/success-stories/payabl","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-builds-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/builds","to":"api-builds-family"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-workspaces-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/workspaces","to":"api-workspaces-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/coder-improves-developer-productivity","to":"time-to-value"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"workspace-scheduling","id":"workspace-scheduling:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"cost control drives renewal economics; corpus infers, no direct Coder statement","source":"https://coder.com/docs/user-guides/workspace-scheduling","to":"renewal-expansion"}],"objects":[{"id":"adoption-depth","kind":"theater","label":"Adoption Depth"},{"id":"agent-governance","kind":"asset","label":"AI Agent Governance"},{"id":"air-gap-deployment","kind":"asset","label":"Air-Gapped Deployment"},{"id":"api-authentication","kind":"asset","label":"REST API: Authentication & Tokens"},{"id":"api-builds-family","kind":"asset","label":"REST API: Builds Family"},{"id":"api-templates-family","kind":"asset","label":"REST API: Templates Family"},{"id":"api-workspaces-family","kind":"asset","label":"REST API: Workspaces Family"},{"id":"audit-logging","kind":"asset","label":"Audit Logging (Premium)"},{"id":"cli-prebuilds","kind":"asset","label":"CLI: coder prebuilds"},{"id":"cli-templates-push","kind":"asset","label":"CLI: coder templates push"},{"id":"cli-templates-versions","kind":"asset","label":"CLI: coder templates versions"},{"id":"cli-tokens","kind":"asset","label":"CLI: coder tokens"},{"id":"coder","kind":"actor","label":"Coder Technologies"},{"id":"coderd-provider","kind":"asset","label":"coderd Terraform Provider"},{"id":"dormancy-cleanup","kind":"asset","label":"Dormancy & Auto-Deletion"},{"id":"external-provisioners","kind":"asset","label":"External Provisioners & Keys"},{"id":"health-check-endpoint","kind":"asset","label":"Health Check Endpoint"},{"id":"health-monitoring","kind":"asset","label":"Deployment Health Monitoring"},{"id":"license-management","kind":"asset","label":"License Management"},{"id":"notification-webhooks","kind":"asset","label":"Webhook Notification Delivery"},{"id":"notifications-delivery","kind":"asset","label":"Notifications & Webhooks"},{"id":"prebuilt-workspaces","kind":"asset","label":"Prebuilt Workspaces"},{"id":"prometheus-metrics","kind":"asset","label":"Prometheus Metrics"},{"id":"provisioner-management","kind":"asset","label":"Provisioner Management"},{"id":"renewal-expansion","kind":"theater","label":"Renewal & Expansion"},{"id":"template-management","kind":"asset","label":"Template Management"},{"id":"ticket-deflection","kind":"theater","label":"Support-Ticket Deflection"},{"id":"time-to-value","kind":"theater","label":"Time-to-Value"},{"id":"token-auth","kind":"asset","label":"Token Authentication"},{"id":"user-onboarding","kind":"asset","label":"User & Team Onboarding"},{"id":"workspace-provisioning","kind":"asset","label":"Workspace Provisioning"},{"id":"workspace-scheduling","kind":"asset","label":"Workspace Scheduling (autostart/autostop/TTL)"}],"overlay":null,"table":[{"a":"controls","b":"controls","gives":"controls"},{"a":"controls","b":"depends-on","gives":"controls"},{"a":"depends-on","b":"depends-on","gives":"depends-on"},{"a":"exposes","b":"guaranteed-by","gives":"confronts"},{"a":"guarantees","b":"depends-on","gives":"guarantees"},{"a":"hosts","b":"depends-on","gives":"hosts"},{"a":"member-of","b":"member-of","gives":"member-of"},{"a":"pressures","b":"guaranteed-by","gives":"confronts"},{"a":"pressures","b":"member-of","gives":"exposes"}],"types":["automatable-via","confronts","controls","depends-on","exposes","exposes-api","guaranteed-by","guarantees","hosts","member-of","moves-metric","pressures","signals"]};
 const KINDS = ["actor","bloc","asset","theater"];
@@ -80,8 +87,12 @@ const W = x, H = Y0 + maxRows * DY + 40;
 svg.setAttribute("viewBox", "0 0 " + W + " " + H);
 
 // --- edges (drawn first, under nodes) ---
+// STAR worlds batch their resting ink: one merged path per edge type, so the
+// camera repaints a dozen elements instead of thousands. Individual edges are
+// drawn into a small overlay only while lit — light is the exception, not the DOM.
 const hash = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
 const matchedSet = new Set(DATA.overlay ? DATA.overlay.matched : []);
+const baseInk = {};
 DATA.arrows.forEach(a => {
   const p1 = pos[a.from], p2 = pos[a.to];
   if (!p1 || !p2) return;
@@ -92,17 +103,19 @@ DATA.arrows.forEach(a => {
   // dense worlds thin their ink: thousands of edges at full opacity are a ribbon.
   const d = "M" + p1.x + " " + p1.y + " Q" + cx + " " + cy + " " + p2.x + " " + p2.y;
   const eg = el("g", { class: "edgeg" });
-  eg.dataset.from = a.from; eg.dataset.to = a.to;
-  el("path", {
-    d, class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
-    stroke: typeColor(a.mtype),
-    // the observed universe: in star mode the field rests nearly dark, and light
-    // follows attention — edges illuminate near the cursor, not everywhere.
-    "stroke-opacity": STAR ? 0.07 : (DATA.arrows.length > 800 ? 0.22 : 0.6)
-  }, eg);
+  eg.dataset.from = a.from; eg.dataset.to = a.to; eg.dataset.d = d; eg.dataset.color = typeColor(a.mtype);
+  if (STAR) {
+    (baseInk[typeColor(a.mtype)] = baseInk[typeColor(a.mtype)] || []).push(d);
+  } else {
+    el("path", {
+      d, class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
+      stroke: typeColor(a.mtype),
+      "stroke-opacity": DATA.arrows.length > 800 ? 0.22 : 0.6
+    }, eg);
+    el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: typeColor(a.mtype) }, eg);
+  }
   // a 1.5px curve is no click target: an invisible fat twin carries the pointer.
   el("path", { d, class: "edgehit" }, eg);
-  el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: typeColor(a.mtype) }, eg);
   eg.addEventListener("click", () => {
     panel.innerHTML = "<b>" + a.from + "</b> &mdash;" + a.mtype + "&rarr; <b>" + a.to + "</b>"
       + "<br><small>" + a.id + (a.dual ? " (dual)" : "") + "</small>"
@@ -111,6 +124,23 @@ DATA.arrows.forEach(a => {
       + (a.note ? "<br><small>" + a.note + "</small>" : "") + "</p>";
   });
 });
+
+// --- STAR base ink + lit overlay machinery ---
+let litLayer = null; const shownEdges = new Map();
+if (STAR) {
+  const baseG = el("g", { id: "baseink" });
+  svg.insertBefore(baseG, svg.firstChild);
+  for (const color in baseInk) {
+    el("path", { d: baseInk[color].join(" "), class: "edgebase", stroke: color }, baseG);
+  }
+  litLayer = el("g", { id: "litlayer" });
+  const showEdge = (eg) => {
+    if (shownEdges.has(eg)) return;
+    shownEdges.set(eg, el("path", { d: eg.dataset.d, class: "edgeon", stroke: eg.dataset.color }, litLayer));
+  };
+  const hideEdge = (eg) => { const p = shownEdges.get(eg); if (p) { p.remove(); shownEdges.delete(eg); } };
+  window.__showEdge = showEdge; window.__hideEdge = hideEdge;
+}
 
 // --- missing edges from a pattern overlay ---
 if (DATA.overlay) DATA.overlay.missing.forEach(m => {
@@ -132,8 +162,14 @@ DATA.arrows.forEach(a => {
 // in a four-thousand-edge world.
 const refocus = () => {
   document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", sel.includes(n.dataset.id)));
-  document.querySelectorAll(".edgeg").forEach(e =>
-    e.classList.toggle("dim", sel.length > 0 && !sel.includes(e.dataset.from) && !sel.includes(e.dataset.to)));
+  if (STAR) {
+    // base ink dims as a single style flip; the gaze pass re-lights sel neighborhoods.
+    document.body.classList.toggle("selon", sel.length > 0);
+    if (window.__gaze) window.__gaze();
+  } else {
+    document.querySelectorAll(".edgeg").forEach(e =>
+      e.classList.toggle("dim", sel.length > 0 && !sel.includes(e.dataset.from) && !sel.includes(e.dataset.to)));
+  }
 };
 KINDS.forEach(k => {
   el("text", { x: bandMid[k], y: STAR ? 22 : 34, "text-anchor": "middle", class: "colhead" + (STAR ? " ghost" : "") })
@@ -143,7 +179,8 @@ KINDS.forEach(k => {
     let g;
     if (STAR) {
       g = el("g", { class: "node star", transform: "translate(" + p.x + "," + p.y + ")" });
-      el("circle", { r: 13, class: "starhit" }, g);
+      // the hit target is the star AND its label — clicking a name works.
+      el("rect", { x: -14, y: -10, width: 118, height: 20, class: "labelhit" }, g);
       el("circle", { r: 4, class: "starcore", fill: typeColor(KINDS.indexOf(k) >= 0 ? DATA.types[KINDS.indexOf(k) % DATA.types.length] : DATA.types[0]) }, g);
       const t = el("text", { x: 9, y: 3.5 }, g);
       t.textContent = o.label.length > 18 ? o.label.slice(0, 17) + "…" : o.label;
@@ -181,33 +218,99 @@ if (STAR) {
     (nodeEdges[e.dataset.from] = nodeEdges[e.dataset.from] || []).push(e);
     (nodeEdges[e.dataset.to] = nodeEdges[e.dataset.to] || []).push(e);
   });
-  const R2 = 150 * 150;
+  const R2 = 130 * 130;
   let lit = new Set(), raf = 0, px = 0, py = 0;
   const gaze = () => {
     raf = 0;
+    if (window.__camMoving) return;
     const pt = svg.createSVGPoint(); pt.x = px; pt.y = py;
     const m = svg.getScreenCTM(); if (!m) return;
     const w = pt.matrixTransform(m.inverse());
-    const next = new Set();
+    const cand = [];
     for (const id in pos) {
-      const p = pos[id], dx = p.x - w.x, dy = p.y - w.y;
-      if (dx * dx + dy * dy < R2) next.add(id);
+      const p = pos[id], dx = p.x - w.x, dy = p.y - w.y, d2 = dx * dx + dy * dy;
+      if (d2 < R2) cand.push([d2, id]);
     }
+    // zoomed far out the radius can swallow half the world: light only the nearest.
+    cand.sort((a, b) => a[0] - b[0]);
+    const next = new Set(cand.slice(0, 36).map(c => c[1]));
+    sel.forEach(id => next.add(id));
     lit.forEach(id => { if (!next.has(id)) {
       nodeEls[id] && nodeEls[id].classList.remove("lit");
-      (nodeEdges[id] || []).forEach(e => e.classList.remove("lit"));
+      (nodeEdges[id] || []).forEach(e => window.__hideEdge(e));
     }});
     next.forEach(id => { if (!lit.has(id)) {
       nodeEls[id] && nodeEls[id].classList.add("lit");
-      (nodeEdges[id] || []).forEach(e => e.classList.add("lit"));
+      (nodeEdges[id] || []).forEach(e => window.__showEdge(e));
     }});
     lit = next;
   };
+  window.__gaze = () => { if (!raf) raf = requestAnimationFrame(gaze); };
   svg.addEventListener("pointermove", ev => {
     px = ev.clientX; py = ev.clientY;
     if (!raf) raf = requestAnimationFrame(gaze);
   });
 }
+
+// --- the camera: wheel zoom to cursor, drag pan, pinch, double-click, F/Esc ---
+const VB = { x: 0, y: 0, w: W, h: H };
+let vbRaf = 0, camTimer = 0;
+const applyVB = () => {
+  // while the camera moves: cheap strokes, no transitions — restore when it rests.
+  document.body.classList.add("cam");
+  svg.setAttribute("shape-rendering", "optimizeSpeed");
+  clearTimeout(camTimer);
+  camTimer = setTimeout(() => {
+    document.body.classList.remove("cam");
+    svg.removeAttribute("shape-rendering");
+  }, 140);
+  if (!vbRaf) vbRaf = requestAnimationFrame(() => {
+    vbRaf = 0; svg.setAttribute("viewBox", VB.x + " " + VB.y + " " + VB.w + " " + VB.h);
+  });
+};
+const fit = () => { VB.x = 0; VB.y = 0; VB.w = W; VB.h = H; applyVB(); };
+const clientToWorld = (cx, cy) => {
+  const r = svg.getBoundingClientRect();
+  return { x: VB.x + (cx - r.left) / r.width * VB.w, y: VB.y + (cy - r.top) / r.height * VB.h };
+};
+const zoomAt = (cx, cy, f) => {
+  const w = clientToWorld(cx, cy);
+  const nw = Math.min(W * 1.4, Math.max(W / 60, VB.w / f));
+  const k = nw / VB.w;
+  VB.x = w.x - (w.x - VB.x) * k; VB.y = w.y - (w.y - VB.y) * k;
+  VB.w = nw; VB.h = VB.h * k; applyVB();
+};
+svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.pow(1.0018, -e.deltaY)); }, { passive: false });
+svg.addEventListener("dblclick", e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, 2.2); });
+window.addEventListener("keydown", e => {
+  if (e.key === "f" || e.key === "F") fit();
+  if (e.key === "Escape") { sel.length = 0; refocus(); fit(); }
+});
+const ptrs = new Map(); let dragging = false, pinchD = 0, didDrag = false;
+svg.addEventListener("pointerdown", e => ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }));
+window.addEventListener("pointermove", e => {
+  const pt = ptrs.get(e.pointerId); if (!pt) return;
+  if (ptrs.size === 2) {
+    window.__camMoving = true;
+    pt.x = e.clientX; pt.y = e.clientY;
+    const [a, b] = [...ptrs.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinchD) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinchD);
+    pinchD = d;
+    return;
+  }
+  const dx = e.clientX - pt.x, dy = e.clientY - pt.y;
+  if (!dragging && Math.hypot(dx, dy) > 4) { dragging = true; didDrag = true; window.__camMoving = true; }
+  if (dragging) {
+    const r = svg.getBoundingClientRect();
+    VB.x -= dx / r.width * VB.w; VB.y -= dy / r.height * VB.h; applyVB();
+    pt.x = e.clientX; pt.y = e.clientY;
+  }
+});
+const endPtr = e => { ptrs.delete(e.pointerId); if (!ptrs.size) { dragging = false; pinchD = 0; window.__camMoving = false; } };
+window.addEventListener("pointerup", endPtr); window.addEventListener("pointercancel", endPtr);
+// a pan is not a click: swallow the click that a drag would otherwise fire.
+svg.addEventListener("click", e => { if (didDrag) { e.stopPropagation(); e.preventDefault(); didDrag = false; } }, true);
 
 // --- typed left-fold path search, a direct port of path.rs ---
 const TBL = {}; DATA.table.forEach(r => TBL[r.a + "|" + r.b] = r.gives);
