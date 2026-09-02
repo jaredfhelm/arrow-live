@@ -114,85 +114,107 @@ DATA.arrows.forEach(a => {
   // dense worlds thin their ink: thousands of edges at full opacity are a ribbon.
   const d = "M" + p1.x + " " + p1.y + " Q" + cx + " " + cy + " " + p2.x + " " + p2.y;
   const color = typeColor(a.mtype);
+  // both modes carry edges as data: clicks and hover are arithmetic, not DOM.
+  EDGES.push({ a, d, color, from: a.from, to: a.to,
+    x1: p1.x, y1: p1.y, cx, cy, x2: p2.x, y2: p2.y,
+    bx0: Math.min(p1.x, p2.x, cx) - 14, bx1: Math.max(p1.x, p2.x, cx) + 14,
+    by0: Math.min(p1.y, p2.y, cy) - 14, by1: Math.max(p1.y, p2.y, cy) + 14 });
   if (STAR) {
     (baseInk[color] = baseInk[color] || []).push(d);
-    EDGES.push({ a, d, color, from: a.from, to: a.to,
-      x1: p1.x, y1: p1.y, cx, cy, x2: p2.x, y2: p2.y,
-      bx0: Math.min(p1.x, p2.x, cx) - 12, bx1: Math.max(p1.x, p2.x, cx) + 12,
-      by0: Math.min(p1.y, p2.y, cy) - 12, by1: Math.max(p1.y, p2.y, cy) + 12 });
     return;
   }
   const eg = el("g", { class: "edgeg" });
-  eg.dataset.from = a.from; eg.dataset.to = a.to; eg.dataset.d = d; eg.dataset.color = color;
+  eg.dataset.from = a.from; eg.dataset.to = a.to;
   el("path", {
     d, class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
     stroke: color,
     "stroke-opacity": DATA.arrows.length > 800 ? 0.22 : 0.6
   }, eg);
   el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: color }, eg);
-  // a 1.5px curve is no click target: an invisible fat twin carries the pointer.
-  el("path", { d, class: "edgehit" }, eg);
-  eg.addEventListener("click", () => showEvidence(a));
 });
 
-// --- STAR base ink + lit overlay machinery (pure data in, DOM only when lit) ---
-let litLayer = null; const shownEdges = new Map();
-const nodeE = {};
+// --- base ink (STAR) + shared overlay + arithmetic hit-testing (both modes) ---
+const nodeE = {}; const shownEdges = new Map();
+EDGES.forEach(e => {
+  (nodeE[e.from] = nodeE[e.from] || []).push(e);
+  (nodeE[e.to] = nodeE[e.to] || []).push(e);
+});
 if (STAR) {
   const baseG = el("g", { id: "baseink" });
   svg.insertBefore(baseG, svg.firstChild);
   for (const color in baseInk) {
     el("path", { d: baseInk[color].join(" "), class: "edgebase", stroke: color }, baseG);
   }
-  litLayer = el("g", { id: "litlayer" });
-  EDGES.forEach(e => {
-    (nodeE[e.from] = nodeE[e.from] || []).push(e);
-    (nodeE[e.to] = nodeE[e.to] || []).push(e);
-  });
-  window.__showEdge = (e) => {
-    if (shownEdges.has(e)) return;
-    shownEdges.set(e, el("path", { d: e.d, class: "edgeon", stroke: e.color }, litLayer));
-  };
-  window.__hideEdge = (e) => { const p = shownEdges.get(e); if (p) { p.remove(); shownEdges.delete(e); } };
-  // edge clicks are arithmetic: nearest curve within a screen-scaled threshold.
-  const toWorld = (cx, cy) => {
-    const pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy;
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
-  };
-  let flash = null;
-  svg.addEventListener("click", ev => {
-    if (ev.target.closest(".node")) return;
-    const w = toWorld(ev.clientX, ev.clientY);
-    const m = svg.getScreenCTM(); if (!m) return;
-    const th = 12 / m.a; // 12 screen px, in world units at the current zoom
-    const th2 = th * th;
-    let best = null, bestD = th2;
-    for (const e of EDGES) {
-      if (w.x < e.bx0 || w.x > e.bx1 || w.y < e.by0 || w.y > e.by1) continue;
-      for (let t = 0; t <= 8; t++) {
-        const u = t / 8, v = 1 - u;
-        const qx = v * v * e.x1 + 2 * v * u * e.cx + u * u * e.x2;
-        const qy = v * v * e.y1 + 2 * v * u * e.cy + u * u * e.y2;
-        const dx = qx - w.x, dy = qy - w.y, d2 = dx * dx + dy * dy;
-        if (d2 < bestD) { bestD = d2; best = e; }
-      }
-    }
-    if (best) {
-      showEvidence(best.a);
-      if (flash) flash.remove();
-      flash = el("path", { d: best.d, class: "edgeon", stroke: best.color, "stroke-width": 3 }, litLayer);
-    }
-  });
-  // deterministic probe for automated benches: a client-space point on edge 0.
-  window.__edgeProbe = () => {
-    const e = EDGES[0]; if (!e) return null;
-    const pt = svg.createSVGPoint();
-    pt.x = 0.25 * e.x1 + 0.5 * e.cx + 0.25 * e.x2;
-    pt.y = 0.25 * e.y1 + 0.5 * e.cy + 0.25 * e.y2;
-    const s = pt.matrixTransform(svg.getScreenCTM());
-    return { x: s.x, y: s.y };
-  };
 }
+const litLayer = el("g", { id: "litlayer" });
+window.__showEdge = (e) => {
+  if (shownEdges.has(e)) return;
+  shownEdges.set(e, el("path", { d: e.d, class: "edgeon", stroke: e.color }, litLayer));
+};
+window.__hideEdge = (e) => { const p = shownEdges.get(e); if (p) { p.remove(); shownEdges.delete(e); } };
+// clicks and hover resolve by arithmetic: nearest curve within a screen threshold.
+const toWorld = (cx, cy) => {
+  const pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+};
+const nearestEdge = (cx, cy, thPx) => {
+  const m = svg.getScreenCTM(); if (!m) return null;
+  const w = toWorld(cx, cy);
+  const th = thPx / m.a, th2 = th * th;
+  let best = null, bestD = th2;
+  for (const e of EDGES) {
+    if (w.x < e.bx0 || w.x > e.bx1 || w.y < e.by0 || w.y > e.by1) continue;
+    for (let t = 0; t <= 8; t++) {
+      const u = t / 8, v = 1 - u;
+      const qx = v * v * e.x1 + 2 * v * u * e.cx + u * u * e.x2;
+      const qy = v * v * e.y1 + 2 * v * u * e.cy + u * u * e.y2;
+      const dx = qx - w.x, dy = qy - w.y, d2 = dx * dx + dy * dy;
+      if (d2 < bestD) { bestD = d2; best = e; }
+    }
+  }
+  return best;
+};
+let flash = null;
+svg.addEventListener("click", ev => {
+  if (ev.target.closest(".node")) return;
+  const best = nearestEdge(ev.clientX, ev.clientY, 12);
+  if (best) {
+    showEvidence(best.a);
+    if (flash) flash.remove();
+    flash = el("path", { d: best.d, class: "edgeon", stroke: best.color, "stroke-width": 3 }, litLayer);
+  }
+});
+// hover: the same arithmetic, throttled — the nearest edge glows and the cursor says so.
+let hoverPath = null, hovRaf = 0, hx = 0, hy = 0;
+const hover = () => {
+  hovRaf = 0;
+  if (window.__camMoving) return;
+  const best = nearestEdge(hx, hy, 9);
+  if (hoverPath) { hoverPath.remove(); hoverPath = null; }
+  if (best) hoverPath = el("path", { d: best.d, class: "edgeon", stroke: best.color, "stroke-width": 3 }, litLayer);
+  svg.style.cursor = best ? "pointer" : "";
+};
+svg.addEventListener("pointermove", ev => {
+  hx = ev.clientX; hy = ev.clientY;
+  if (!hovRaf) hovRaf = requestAnimationFrame(hover);
+});
+// deterministic probe for automated benches: a client-space point that lies on
+// some edge's curve AND is not covered by a node (where a node would rightly win).
+window.__edgeProbe = () => {
+  const m = svg.getScreenCTM(); if (!m) return null;
+  for (const e of EDGES) {
+    for (let t = 1; t < 8; t++) {
+      const u = t / 8, v = 1 - u;
+      const pt = svg.createSVGPoint();
+      pt.x = v * v * e.x1 + 2 * v * u * e.cx + u * u * e.x2;
+      pt.y = v * v * e.y1 + 2 * v * u * e.cy + u * u * e.y2;
+      const s = pt.matrixTransform(m);
+      const hit = document.elementFromPoint(s.x, s.y);
+      if (hit && !hit.closest(".node")) return { x: s.x, y: s.y };
+    }
+  }
+  return null;
+};
 
 // --- missing edges from a pattern overlay ---
 if (DATA.overlay) DATA.overlay.missing.forEach(m => {
