@@ -14,7 +14,7 @@ small{color:#8b96a5}
 <div id="globe"></div>
 <div id="panel"><h1>arrow — the world, cited</h1>
 <div id="info"><small>Every arc is an evidence-bearing relation from the live world journal.
-Moving arcs are the latest ingested day; still arcs are standing record. Click an arc for its citation; click a country to focus it. Drag to spin, scroll to zoom.</small></div>
+From orbit: the standing summary, still. Zoom in: individual relations, where only the latest ingested day moves. Click an arc for its citation; click a country to focus it. Drag to spin, scroll to zoom.</small></div>
 <div class="lg" id="legend"></div></div>
 <div id="foot"></div>
 <script src="https://unpkg.com/globe.gl@2.32.2/dist/globe.gl.min.js"></script>
@@ -54,9 +54,9 @@ const g = Globe({ rendererConfig: { antialias: false, powerPreference: 'high-per
   .arcsTransitionDuration(0)
   .pointsTransitionDuration(0)
   .pointsMerge(true)
-  .arcDashLength(a => a.date === D.latest ? 0.45 : 1)
-  .arcDashGap(a => a.date === D.latest ? 0.6 : 0)
-  .arcDashAnimateTime(a => a.date === D.latest ? 2400 : 0)
+  .arcDashLength(a => (!a.n && a.date === D.latest) ? 0.45 : 1)
+  .arcDashGap(a => (!a.n && a.date === D.latest) ? 0.6 : 0)
+  .arcDashAnimateTime(a => (!a.n && a.date === D.latest) ? 2400 : 0)
   .arcLabel(a => a.from+' —'+a.t+'→ '+a.to+(a.n>1?' ('+a.n+' relations)':''))
   .onArcClick(a => {
     info.innerHTML = '<b>'+a.from+'</b> —'+a.t+'→ <b>'+a.to+'</b><br>'
