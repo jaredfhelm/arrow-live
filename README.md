@@ -13,6 +13,9 @@ carrying a control run that proves the detector needed the whole pattern.
   world-event data, thousands of edges, each carrying a source, a date, and a basis (official /
   reported / inferred). Click an edge for its evidence; click a node to light its neighborhood; click
   two nodes for their computed composites.
+- **[The globe](https://jaredfhelm.github.io/arrow-live/globe.html)** — the same world on a spinning
+  Earth: every arc an evidence-bearing relation, click for the citation. 199/199 actors placed,
+  nothing silently dropped.
 - **[A platform-topology sample](https://jaredfhelm.github.io/arrow-live/platform-sample.html)** — the
   deployment shape: the same instrument pointed at a developer platform's capability map.
 
