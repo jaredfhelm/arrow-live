@@ -2,11 +2,12 @@
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>arrow board</title><style>
 body{margin:0;display:flex;font:13px/1.4 system-ui,sans-serif;background:#111;color:#ddd}
 body.cosmos{background:#080b11}
-#g{flex:1;height:100vh;touch-action:none}
+#gwrap{flex:1;height:100vh;overflow:hidden;touch-action:none;position:relative}
+#g{width:100%;height:100%;display:block;will-change:transform;transform-origin:0 0}
 #panel{width:340px;height:100vh;overflow:auto;padding:14px;background:#1a1a1a;border-left:1px solid #333;box-sizing:border-box}
 @media (max-width:720px){
   body{flex-direction:column}
-  #g{height:62vh;width:100vw}
+  #gwrap{height:62vh;width:100vw}
   #panel{width:100vw;height:38vh;border-left:none;border-top:1px solid #333}
 }
 #panel h2{font-size:14px;margin:0 0 8px}
@@ -48,7 +49,7 @@ body.cam .edge,body.cam .node text,body.cam .starcore,body.cam .edgebase{transit
 .chain:hover{background:#2a2a2a}
 small{color:#888}
 </style></head><body>
-<svg id="g"></svg><div id="panel"><h2>arrow board</h2><div id="info">click an edge for its evidence; click two nodes for their composites.</div></div><div id="hint">scroll zoom &middot; drag pan &middot; double-click dive &middot; F fit &middot; Esc reset</div>
+<div id="gwrap"><svg id="g"></svg></div><div id="panel"><h2>arrow board</h2><div id="info">click an edge for its evidence; click two nodes for their composites.</div></div><div id="hint">scroll zoom &middot; drag pan &middot; double-click dive &middot; F fit &middot; Esc reset</div>
 <script>
 const DATA = {"arrows":[{"basis":"reported","date":"2026-08-30","dual":false,"from":"agent-governance","id":"agent-governance:moves-metric:adoption-depth:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/introducing-coder-agents","to":"adoption-depth"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"air-gap-deployment","id":"air-gap-deployment:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"air-gap capability as regulated-segment retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"audit-logging","id":"audit-logging:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"governance features as regulated-industry retention lever","source":"https://coder.com/use-cases/financial-services","to":"renewal-expansion"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"dormancy-cleanup","id":"dormancy-cleanup:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"resource hygiene as cost lever","source":"https://coder.com/docs/admin/templates/managing-templates/schedule","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:health-check-endpoint:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/health-check","to":"health-check-endpoint"},{"basis":"official","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:exposes-api:prometheus-metrics:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/integrations/prometheus","to":"prometheus-metrics"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"health-monitoring","id":"health-monitoring:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":"deflection section of value-levers doc explicitly thin; corpus cross-edge only","source":"https://coder.com/docs/admin/monitoring","to":"ticket-deflection"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":"license resource in provider docs listing; individual schemas unverified per corpus","source":"https://api.github.com/repos/coder/terraform-provider-coderd/contents/docs/resources","to":"coderd-provider"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"license-management","id":"license-management:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":null,"source":"https://coder.com/pricing","to":"renewal-expansion"},{"basis":"official","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:exposes-api:notification-webhooks:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"notification-webhooks"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"notifications-delivery","id":"notifications-delivery:moves-metric:ticket-deflection:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/monitoring/notifications","to":"ticket-deflection"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:automatable-via:cli-prebuilds:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli","to":"cli-prebuilds"},{"basis":"official","date":"2026-08-30","dual":false,"from":"prebuilt-workspaces","id":"prebuilt-workspaces:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/docs/admin/templates/extending-templates/prebuilt-workspaces","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"provisioner-management","id":"provisioner-management:automatable-via:external-provisioners:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/admin/provisioners","to":"external-provisioners"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-push:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_push","to":"cli-templates-push"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:cli-templates-versions:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/templates_versions","to":"cli-templates-versions"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:automatable-via:coderd-provider:0","mtype":"automatable-via","note":null,"source":"https://registry.terraform.io/providers/coder/coderd/latest/docs","to":"coderd-provider"},{"basis":"official","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:exposes-api:api-templates-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/templates","to":"api-templates-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"template-management","id":"template-management:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/how-abridge-scaled-developer-infrastructure-from-days-to-minutes","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:automatable-via:cli-tokens:0","mtype":"automatable-via","note":null,"source":"https://coder.com/docs/reference/cli/tokens","to":"cli-tokens"},{"basis":"official","date":"2026-08-30","dual":false,"from":"token-auth","id":"token-auth:exposes-api:api-authentication:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/authentication","to":"api-authentication"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"user-onboarding","id":"user-onboarding:moves-metric:time-to-value:0","mtype":"moves-metric","note":"payabl: ~8 hrs/week freed for DevOps/senior engineers","source":"https://coder.com/success-stories/payabl","to":"time-to-value"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-builds-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/builds","to":"api-builds-family"},{"basis":"official","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:exposes-api:api-workspaces-family:0","mtype":"exposes-api","note":null,"source":"https://coder.com/docs/reference/api/workspaces","to":"api-workspaces-family"},{"basis":"reported","date":"2026-08-30","dual":false,"from":"workspace-provisioning","id":"workspace-provisioning:moves-metric:time-to-value:0","mtype":"moves-metric","note":null,"source":"https://coder.com/blog/coder-improves-developer-productivity","to":"time-to-value"},{"basis":"inferred","date":"2026-08-30","dual":false,"from":"workspace-scheduling","id":"workspace-scheduling:moves-metric:renewal-expansion:0","mtype":"moves-metric","note":"cost control drives renewal economics; corpus infers, no direct Coder statement","source":"https://coder.com/docs/user-guides/workspace-scheduling","to":"renewal-expansion"}],"objects":[{"id":"adoption-depth","kind":"theater","label":"Adoption Depth"},{"id":"agent-governance","kind":"asset","label":"AI Agent Governance"},{"id":"air-gap-deployment","kind":"asset","label":"Air-Gapped Deployment"},{"id":"api-authentication","kind":"asset","label":"REST API: Authentication & Tokens"},{"id":"api-builds-family","kind":"asset","label":"REST API: Builds Family"},{"id":"api-templates-family","kind":"asset","label":"REST API: Templates Family"},{"id":"api-workspaces-family","kind":"asset","label":"REST API: Workspaces Family"},{"id":"audit-logging","kind":"asset","label":"Audit Logging (Premium)"},{"id":"cli-prebuilds","kind":"asset","label":"CLI: coder prebuilds"},{"id":"cli-templates-push","kind":"asset","label":"CLI: coder templates push"},{"id":"cli-templates-versions","kind":"asset","label":"CLI: coder templates versions"},{"id":"cli-tokens","kind":"asset","label":"CLI: coder tokens"},{"id":"coder","kind":"actor","label":"Coder Technologies"},{"id":"coderd-provider","kind":"asset","label":"coderd Terraform Provider"},{"id":"dormancy-cleanup","kind":"asset","label":"Dormancy & Auto-Deletion"},{"id":"external-provisioners","kind":"asset","label":"External Provisioners & Keys"},{"id":"health-check-endpoint","kind":"asset","label":"Health Check Endpoint"},{"id":"health-monitoring","kind":"asset","label":"Deployment Health Monitoring"},{"id":"license-management","kind":"asset","label":"License Management"},{"id":"notification-webhooks","kind":"asset","label":"Webhook Notification Delivery"},{"id":"notifications-delivery","kind":"asset","label":"Notifications & Webhooks"},{"id":"prebuilt-workspaces","kind":"asset","label":"Prebuilt Workspaces"},{"id":"prometheus-metrics","kind":"asset","label":"Prometheus Metrics"},{"id":"provisioner-management","kind":"asset","label":"Provisioner Management"},{"id":"renewal-expansion","kind":"theater","label":"Renewal & Expansion"},{"id":"template-management","kind":"asset","label":"Template Management"},{"id":"ticket-deflection","kind":"theater","label":"Support-Ticket Deflection"},{"id":"time-to-value","kind":"theater","label":"Time-to-Value"},{"id":"token-auth","kind":"asset","label":"Token Authentication"},{"id":"user-onboarding","kind":"asset","label":"User & Team Onboarding"},{"id":"workspace-provisioning","kind":"asset","label":"Workspace Provisioning"},{"id":"workspace-scheduling","kind":"asset","label":"Workspace Scheduling (autostart/autostop/TTL)"}],"overlay":null,"table":[{"a":"controls","b":"controls","gives":"controls"},{"a":"controls","b":"depends-on","gives":"controls"},{"a":"depends-on","b":"depends-on","gives":"depends-on"},{"a":"exposes","b":"guaranteed-by","gives":"confronts"},{"a":"guarantees","b":"depends-on","gives":"guarantees"},{"a":"hosts","b":"depends-on","gives":"hosts"},{"a":"member-of","b":"member-of","gives":"member-of"},{"a":"pressures","b":"guaranteed-by","gives":"confronts"},{"a":"pressures","b":"member-of","gives":"exposes"}],"types":["automatable-via","confronts","controls","depends-on","exposes","exposes-api","guaranteed-by","guarantees","hosts","member-of","moves-metric","pressures","signals"]};
 const KINDS = ["actor","bloc","asset","theater"];
@@ -93,6 +94,16 @@ svg.setAttribute("viewBox", "0 0 " + W + " " + H);
 const hash = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
 const matchedSet = new Set(DATA.overlay ? DATA.overlay.matched : []);
 const baseInk = {};
+// STAR worlds carry ZERO resting edge DOM: edges live as data, base ink is one
+// merged path per type, and hit-testing is arithmetic at click time.
+const EDGES = [];
+const showEvidence = a => {
+  panel.innerHTML = "<b>" + a.from + "</b> &mdash;" + a.mtype + "&rarr; <b>" + a.to + "</b>"
+    + "<br><small>" + a.id + (a.dual ? " (dual)" : "") + "</small>"
+    + "<p>[" + a.basis + " " + a.date + "]<br>"
+    + (/^https?:/.test(a.source) ? '<a href="' + a.source + '">' + a.source + "</a>" : a.source)
+    + (a.note ? "<br><small>" + a.note + "</small>" : "") + "</p>";
+};
 DATA.arrows.forEach(a => {
   const p1 = pos[a.from], p2 = pos[a.to];
   if (!p1 || !p2) return;
@@ -102,31 +113,31 @@ DATA.arrows.forEach(a => {
   const cx = mx - (dy / len) * bend, cy = my + (dx / len) * bend;
   // dense worlds thin their ink: thousands of edges at full opacity are a ribbon.
   const d = "M" + p1.x + " " + p1.y + " Q" + cx + " " + cy + " " + p2.x + " " + p2.y;
-  const eg = el("g", { class: "edgeg" });
-  eg.dataset.from = a.from; eg.dataset.to = a.to; eg.dataset.d = d; eg.dataset.color = typeColor(a.mtype);
+  const color = typeColor(a.mtype);
   if (STAR) {
-    (baseInk[typeColor(a.mtype)] = baseInk[typeColor(a.mtype)] || []).push(d);
-  } else {
-    el("path", {
-      d, class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
-      stroke: typeColor(a.mtype),
-      "stroke-opacity": DATA.arrows.length > 800 ? 0.22 : 0.6
-    }, eg);
-    el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: typeColor(a.mtype) }, eg);
+    (baseInk[color] = baseInk[color] || []).push(d);
+    EDGES.push({ a, d, color, from: a.from, to: a.to,
+      x1: p1.x, y1: p1.y, cx, cy, x2: p2.x, y2: p2.y,
+      bx0: Math.min(p1.x, p2.x, cx) - 12, bx1: Math.max(p1.x, p2.x, cx) + 12,
+      by0: Math.min(p1.y, p2.y, cy) - 12, by1: Math.max(p1.y, p2.y, cy) + 12 });
+    return;
   }
+  const eg = el("g", { class: "edgeg" });
+  eg.dataset.from = a.from; eg.dataset.to = a.to; eg.dataset.d = d; eg.dataset.color = color;
+  el("path", {
+    d, class: "edge" + (matchedSet.has(a.id) ? " matched" : ""),
+    stroke: color,
+    "stroke-opacity": DATA.arrows.length > 800 ? 0.22 : 0.6
+  }, eg);
+  el("circle", { cx: (p2.x + cx) / 2, cy: (p2.y + cy) / 2, r: 3, fill: color }, eg);
   // a 1.5px curve is no click target: an invisible fat twin carries the pointer.
   el("path", { d, class: "edgehit" }, eg);
-  eg.addEventListener("click", () => {
-    panel.innerHTML = "<b>" + a.from + "</b> &mdash;" + a.mtype + "&rarr; <b>" + a.to + "</b>"
-      + "<br><small>" + a.id + (a.dual ? " (dual)" : "") + "</small>"
-      + "<p>[" + a.basis + " " + a.date + "]<br>"
-      + (/^https?:/.test(a.source) ? '<a href="' + a.source + '">' + a.source + "</a>" : a.source)
-      + (a.note ? "<br><small>" + a.note + "</small>" : "") + "</p>";
-  });
+  eg.addEventListener("click", () => showEvidence(a));
 });
 
-// --- STAR base ink + lit overlay machinery ---
+// --- STAR base ink + lit overlay machinery (pure data in, DOM only when lit) ---
 let litLayer = null; const shownEdges = new Map();
+const nodeE = {};
 if (STAR) {
   const baseG = el("g", { id: "baseink" });
   svg.insertBefore(baseG, svg.firstChild);
@@ -134,12 +145,53 @@ if (STAR) {
     el("path", { d: baseInk[color].join(" "), class: "edgebase", stroke: color }, baseG);
   }
   litLayer = el("g", { id: "litlayer" });
-  const showEdge = (eg) => {
-    if (shownEdges.has(eg)) return;
-    shownEdges.set(eg, el("path", { d: eg.dataset.d, class: "edgeon", stroke: eg.dataset.color }, litLayer));
+  EDGES.forEach(e => {
+    (nodeE[e.from] = nodeE[e.from] || []).push(e);
+    (nodeE[e.to] = nodeE[e.to] || []).push(e);
+  });
+  window.__showEdge = (e) => {
+    if (shownEdges.has(e)) return;
+    shownEdges.set(e, el("path", { d: e.d, class: "edgeon", stroke: e.color }, litLayer));
   };
-  const hideEdge = (eg) => { const p = shownEdges.get(eg); if (p) { p.remove(); shownEdges.delete(eg); } };
-  window.__showEdge = showEdge; window.__hideEdge = hideEdge;
+  window.__hideEdge = (e) => { const p = shownEdges.get(e); if (p) { p.remove(); shownEdges.delete(e); } };
+  // edge clicks are arithmetic: nearest curve within a screen-scaled threshold.
+  const toWorld = (cx, cy) => {
+    const pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  };
+  let flash = null;
+  svg.addEventListener("click", ev => {
+    if (ev.target.closest(".node")) return;
+    const w = toWorld(ev.clientX, ev.clientY);
+    const m = svg.getScreenCTM(); if (!m) return;
+    const th = 12 / m.a; // 12 screen px, in world units at the current zoom
+    const th2 = th * th;
+    let best = null, bestD = th2;
+    for (const e of EDGES) {
+      if (w.x < e.bx0 || w.x > e.bx1 || w.y < e.by0 || w.y > e.by1) continue;
+      for (let t = 0; t <= 8; t++) {
+        const u = t / 8, v = 1 - u;
+        const qx = v * v * e.x1 + 2 * v * u * e.cx + u * u * e.x2;
+        const qy = v * v * e.y1 + 2 * v * u * e.cy + u * u * e.y2;
+        const dx = qx - w.x, dy = qy - w.y, d2 = dx * dx + dy * dy;
+        if (d2 < bestD) { bestD = d2; best = e; }
+      }
+    }
+    if (best) {
+      showEvidence(best.a);
+      if (flash) flash.remove();
+      flash = el("path", { d: best.d, class: "edgeon", stroke: best.color, "stroke-width": 3 }, litLayer);
+    }
+  });
+  // deterministic probe for automated benches: a client-space point on edge 0.
+  window.__edgeProbe = () => {
+    const e = EDGES[0]; if (!e) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = 0.25 * e.x1 + 0.5 * e.cx + 0.25 * e.x2;
+    pt.y = 0.25 * e.y1 + 0.5 * e.cy + 0.25 * e.y2;
+    const s = pt.matrixTransform(svg.getScreenCTM());
+    return { x: s.x, y: s.y };
+  };
 }
 
 // --- missing edges from a pattern overlay ---
@@ -212,12 +264,8 @@ KINDS.forEach(k => {
 // while the neighborhood under the cursor comes alive.
 if (STAR) {
   document.body.classList.add("cosmos");
-  const nodeEls = {}, nodeEdges = {};
+  const nodeEls = {}, nodeEdges = nodeE;
   document.querySelectorAll(".node").forEach(n => nodeEls[n.dataset.id] = n);
-  document.querySelectorAll(".edgeg").forEach(e => {
-    (nodeEdges[e.dataset.from] = nodeEdges[e.dataset.from] || []).push(e);
-    (nodeEdges[e.dataset.to] = nodeEdges[e.dataset.to] || []).push(e);
-  });
   const R2 = 130 * 130;
   let lit = new Set(), raf = 0, px = 0, py = 0;
   const gaze = () => {
@@ -252,33 +300,49 @@ if (STAR) {
   });
 }
 
-// --- the camera: wheel zoom to cursor, drag pan, pinch, double-click, F/Esc ---
+// --- the camera: composited while moving, crisp at rest -----------------------
+// During a gesture the world moves as a GPU transform on the rendered texture —
+// zero vector repaints per frame. When the gesture settles, the transform is
+// baked into the viewBox once and cleared, restoring full crispness.
 const VB = { x: 0, y: 0, w: W, h: H };
-let vbRaf = 0, camTimer = 0;
-const applyVB = () => {
-  // while the camera moves: cheap strokes, no transitions — restore when it rests.
-  document.body.classList.add("cam");
-  svg.setAttribute("shape-rendering", "optimizeSpeed");
-  clearTimeout(camTimer);
-  camTimer = setTimeout(() => {
-    document.body.classList.remove("cam");
-    svg.removeAttribute("shape-rendering");
-  }, 140);
-  if (!vbRaf) vbRaf = requestAnimationFrame(() => {
-    vbRaf = 0; svg.setAttribute("viewBox", VB.x + " " + VB.y + " " + VB.w + " " + VB.h);
+const P = { k: 1, tx: 0, ty: 0 };          // pending gesture, in screen px
+let tRaf = 0, settleTimer = 0;
+const setVB = () => svg.setAttribute("viewBox", VB.x + " " + VB.y + " " + VB.w + " " + VB.h);
+const applyT = () => {
+  if (!tRaf) tRaf = requestAnimationFrame(() => {
+    tRaf = 0;
+    svg.style.transform = "translate(" + P.tx + "px," + P.ty + "px) scale(" + P.k + ")";
   });
 };
-const fit = () => { VB.x = 0; VB.y = 0; VB.w = W; VB.h = H; applyVB(); };
-const clientToWorld = (cx, cy) => {
-  const r = svg.getBoundingClientRect();
-  return { x: VB.x + (cx - r.left) / r.width * VB.w, y: VB.y + (cy - r.top) / r.height * VB.h };
+const gestureLive = () => {
+  window.__camMoving = true;
+  document.body.classList.add("cam");
+  clearTimeout(settleTimer);
+  settleTimer = setTimeout(settle, 150);
 };
+const settle = () => {
+  clearTimeout(settleTimer);
+  if (P.k !== 1 || P.tx !== 0 || P.ty !== 0) {
+    const r = svg.getBoundingClientRect ? document.getElementById("gwrap").getBoundingClientRect() : null;
+    const upw = VB.w / r.width;             // world units per screen px, pre-gesture
+    VB.x -= (P.tx / P.k) * upw; VB.y -= (P.ty / P.k) * (VB.h / r.height);
+    VB.w = VB.w / P.k; VB.h = VB.h / P.k;
+    P.k = 1; P.tx = 0; P.ty = 0;
+    setVB(); svg.style.transform = "";
+  }
+  document.body.classList.remove("cam");
+  window.__camMoving = false;
+  if (window.__gaze) window.__gaze();
+};
+const fit = () => { P.k = 1; P.tx = 0; P.ty = 0; svg.style.transform = ""; VB.x = 0; VB.y = 0; VB.w = W; VB.h = H; setVB(); window.__camMoving = false; };
+const totalScale = () => (W / VB.w) * P.k;
 const zoomAt = (cx, cy, f) => {
-  const w = clientToWorld(cx, cy);
-  const nw = Math.min(W * 1.4, Math.max(W / 60, VB.w / f));
-  const k = nw / VB.w;
-  VB.x = w.x - (w.x - VB.x) * k; VB.y = w.y - (w.y - VB.y) * k;
-  VB.w = nw; VB.h = VB.h * k; applyVB();
+  const t = totalScale() * f;
+  if (t > 60 || t < 0.7) return;
+  const r = document.getElementById("gwrap").getBoundingClientRect();
+  const ax = cx - r.left, ay = cy - r.top;
+  P.tx = ax - (ax - P.tx) * f; P.ty = ay - (ay - P.ty) * f; P.k *= f;
+  gestureLive(); applyT();
 };
 svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.pow(1.0018, -e.deltaY)); }, { passive: false });
 svg.addEventListener("dblclick", e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, 2.2); });
@@ -291,23 +355,22 @@ svg.addEventListener("pointerdown", e => ptrs.set(e.pointerId, { x: e.clientX, y
 window.addEventListener("pointermove", e => {
   const pt = ptrs.get(e.pointerId); if (!pt) return;
   if (ptrs.size === 2) {
-    window.__camMoving = true;
     pt.x = e.clientX; pt.y = e.clientY;
     const [a, b] = [...ptrs.values()];
     const d = Math.hypot(a.x - b.x, a.y - b.y);
     if (pinchD) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinchD);
-    pinchD = d;
+    pinchD = d; didDrag = true;
     return;
   }
   const dx = e.clientX - pt.x, dy = e.clientY - pt.y;
-  if (!dragging && Math.hypot(dx, dy) > 4) { dragging = true; didDrag = true; window.__camMoving = true; }
+  if (!dragging && Math.hypot(dx, dy) > 4) { dragging = true; didDrag = true; }
   if (dragging) {
-    const r = svg.getBoundingClientRect();
-    VB.x -= dx / r.width * VB.w; VB.y -= dy / r.height * VB.h; applyVB();
+    P.tx += dx; P.ty += dy;
     pt.x = e.clientX; pt.y = e.clientY;
+    gestureLive(); applyT();
   }
 });
-const endPtr = e => { ptrs.delete(e.pointerId); if (!ptrs.size) { dragging = false; pinchD = 0; window.__camMoving = false; } };
+const endPtr = e => { ptrs.delete(e.pointerId); if (!ptrs.size) { dragging = false; pinchD = 0; settle(); } };
 window.addEventListener("pointerup", endPtr); window.addEventListener("pointercancel", endPtr);
 // a pan is not a click: swallow the click that a drag would otherwise fire.
 svg.addEventListener("click", e => { if (didDrag) { e.stopPropagation(); e.preventDefault(); didDrag = false; } }, true);
